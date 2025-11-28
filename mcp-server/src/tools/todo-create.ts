@@ -10,19 +10,19 @@ export const todoCreateTool: Tool = {
     properties: {
       title: {
         type: 'string',
-        description: 'Tiêu đề của TODO',
+        description: 'Title of the TODO',
         minLength: 1,
         maxLength: 200,
       },
       description: {
         type: 'string',
-        description: 'Mô tả chi tiết của TODO',
+        description: 'Detailed description of the TODO',
         maxLength: 1000,
       },
       priority: {
         type: 'string',
         enum: ['low', 'medium', 'high'],
-        description: 'Độ ưu tiên của TODO',
+        description: 'Priority level of the TODO',
         default: 'medium',
       },
       tags: {
@@ -30,7 +30,7 @@ export const todoCreateTool: Tool = {
         items: {
           type: 'string',
         },
-        description: 'Danh sách tags',
+        description: 'List of tags',
         maxItems: 10,
       },
     },

@@ -4,29 +4,29 @@ import { TodoListFilters, TodoListResponse } from '../types/todo.js';
 
 export const todoListTool: Tool = {
   name: 'todo_list',
-  description: 'Lấy danh sách TODOs với khả năng filter',
+  description: 'Get list of TODOs with filtering capabilities',
   inputSchema: {
     type: 'object',
     properties: {
       completed: {
         type: 'boolean',
-        description: 'Filter theo trạng thái hoàn thành',
+        description: 'Filter by completion status',
       },
       priority: {
         type: 'string',
         enum: ['low', 'medium', 'high'],
-        description: 'Filter theo độ ưu tiên',
+        description: 'Filter by priority level',
       },
       tags: {
         type: 'array',
         items: {
           type: 'string',
         },
-        description: 'Filter theo tags',
+        description: 'Filter by tags',
       },
       search: {
         type: 'string',
-        description: 'Tìm kiếm trong title và description',
+        description: 'Search in title and description',
       },
       sortBy: {
         type: 'string',

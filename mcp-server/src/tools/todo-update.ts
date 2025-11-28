@@ -4,41 +4,41 @@ import { TodoUpdateInput, Todo } from '../types/todo.js';
 
 export const todoUpdateTool: Tool = {
   name: 'todo_update',
-  description: 'Cập nhật thông tin của một TODO',
+  description: 'Update information of a TODO',
   inputSchema: {
     type: 'object',
     properties: {
       id: {
         type: 'string',
-        description: 'ID của TODO cần update',
+        description: 'ID of the TODO to update',
         pattern: '^[a-f0-9-]{36}$',
       },
       title: {
         type: 'string',
         minLength: 1,
         maxLength: 200,
-        description: 'Tiêu đề mới của TODO',
+        description: 'New title of the TODO',
       },
       description: {
         type: 'string',
         maxLength: 1000,
-        description: 'Mô tả mới của TODO',
+        description: 'New description of the TODO',
       },
       completed: {
         type: 'boolean',
-        description: 'Trạng thái hoàn thành',
+        description: 'Completion status',
       },
       priority: {
         type: 'string',
         enum: ['low', 'medium', 'high'],
-        description: 'Độ ưu tiên mới',
+        description: 'New priority level',
       },
       tags: {
         type: 'array',
         items: {
           type: 'string',
         },
-        description: 'Danh sách tags mới',
+        description: 'New list of tags',
         maxItems: 10,
       },
     },

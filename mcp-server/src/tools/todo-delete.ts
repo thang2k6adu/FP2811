@@ -3,13 +3,13 @@ import { todoStorage } from '../storage/todo-storage.js';
 
 export const todoDeleteTool: Tool = {
   name: 'todo_delete',
-  description: 'Xóa một TODO',
+  description: 'Delete a TODO',
   inputSchema: {
     type: 'object',
     properties: {
       id: {
         type: 'string',
-        description: 'ID của TODO cần xóa',
+        description: 'ID of the TODO to delete',
         pattern: '^[a-f0-9-]{36}$',
       },
     },

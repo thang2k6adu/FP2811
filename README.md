@@ -57,7 +57,14 @@ npm install
 5. **Configure Environment** (optional, for LLM chat):
 ```bash
 cd mcp-client
-echo "VITE_ANTHROPIC_API_KEY=your-api-key-here" > .env
+
+# Option 1: Use OpenAI GPT-3.5 (cheaper, recommended)
+echo "VITE_LLM_PROVIDER=openai" > .env
+echo "VITE_OPENAI_API_KEY=sk-..." >> .env
+
+# Option 2: Use Claude (more expensive but better quality)
+# echo "VITE_LLM_PROVIDER=claude" > .env
+# echo "VITE_ANTHROPIC_API_KEY=sk-ant-api03-..." >> .env
 ```
 
 ### Running the Application
@@ -123,7 +130,7 @@ See [API.md](docs/API.md) for detailed API documentation.
 
 ## LLM Chat Interface
 
-The application includes a natural language chat interface powered by Claude. You can interact with your TODOs using natural language:
+The application includes a natural language chat interface. You can use either OpenAI GPT-3.5-turbo (cheaper) or Claude 3.5 Sonnet (better quality). You can interact with your TODOs using natural language:
 
 - "Create a todo to buy milk with high priority"
 - "Show me all incomplete todos"
@@ -170,8 +177,11 @@ FP2811/
 
 ### LLM Chat not working
 
-- Ensure `VITE_ANTHROPIC_API_KEY` is set in `mcp-client/.env`
-- Check your Anthropic API key is valid
+- Ensure API key is set in `mcp-client/.env`:
+  - For OpenAI: `VITE_OPENAI_API_KEY=sk-...`
+  - For Claude: `VITE_ANTHROPIC_API_KEY=sk-ant-api03-...`
+- Set `VITE_LLM_PROVIDER=openai` or `VITE_LLM_PROVIDER=claude`
+- Check your API key is valid
 - Verify network connectivity
 
 ### Build errors

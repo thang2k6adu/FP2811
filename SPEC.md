@@ -1,24 +1,24 @@
-# MCP TODO Demo Application - Đặc Tả Kỹ Thuật
+# MCP TODO Demo Application - Technical Specification
 
-## 1. Tổng Quan Dự Án
+## 1. Project Overview
 
-### 1. 1.  Mục Đích
-Xây dựng một ứng dụng demo hoàn chỉnh minh họa khả năng của Model Context Protocol (MCP) thông qua một TODO application đơn giản nhưng đầy đủ chức năng.
+### 1.1. Purpose
+Build a complete demo application showcasing the capabilities of Model Context Protocol (MCP) through a simple yet fully functional TODO application.
 
-### 1.2. Phạm Vi
-- **MCP Server**: Cung cấp 4 tools xử lý TODO qua MCP protocol
-- **MCP-UI Client**: Giao diện web cho phép tương tác với MCP server
-- **LLM Integration**: Tích hợp LLM model client để test và tương tác bằng ngôn ngữ tự nhiên
-- **Documentation**: Hướng dẫn đầy đủ để setup và chạy ứng dụng
+### 1.2. Scope
+- **MCP Server**: Provides 4 tools for TODO management via MCP protocol
+- **MCP-UI Client**: Web interface for interacting with MCP server
+- **LLM Integration**: Integrate LLM model client for testing and natural language interaction
+- **Documentation**: Complete guide for setup and running the application
 
-### 1.3. Yêu Cầu Chính Từ Client
+### 1.3. Main Requirements from Client
 > "Build a minimal MCP server exposing four tools: todo_create, todo_list, todo_update, and todo_delete, each with clear JSON schemas. Create a small MCP-UI client where users can add todos, list them, edit them, and delete them through buttons tied to these MCP tools."
 
-> **Hint quan trọng**: "if you don't use a model llm client to test your work, it means you are on the wrong track"
+> **Important Hint**: "if you don't use a model llm client to test your work, it means you are on the wrong track"
 
 ---
 
-## 2. Kiến Trúc Hệ Thống
+## 2. System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -42,10 +42,10 @@ Xây dựng một ứng dụng demo hoàn chỉnh minh họa khả năng của M
 
 ## 3. MCP Server Specification
 
-### 3.1.  Công Nghệ
-- **Runtime**: Node.js (TypeScript) hoặc Python
-- **MCP SDK**: `@modelcontextprotocol/sdk` (Node.js) hoặc `mcp` (Python)
-- **Storage**: In-memory hoặc JSON file (để đơn giản)
+### 3.1. Technology
+- **Runtime**: Node.js (TypeScript) or Python
+- **MCP SDK**: `@modelcontextprotocol/sdk` (Node.js) or `mcp` (Python)
+- **Storage**: In-memory or JSON file (for simplicity)
 - **Transport**: stdio (standard input/output)
 
 ### 3.2. TODO Data Model
@@ -53,12 +53,12 @@ Xây dựng một ứng dụng demo hoàn chỉnh minh họa khả năng của M
 ```typescript
 interface Todo {
   id: string;           // UUID v4
-  title: string;        // Tiêu đề TODO
-  description?: string; // Mô tả chi tiết (optional)
-  completed: boolean;   // Trạng thái hoàn thành
+  title: string;        // TODO title
+  description?: string; // Detailed description (optional)
+  completed: boolean;   // Completion status
   createdAt: string;    // ISO 8601 timestamp
   updatedAt: string;    // ISO 8601 timestamp
-  priority?: 'low' | 'medium' | 'high'; // Độ ưu tiên (optional)
+  priority?: 'low' | 'medium' | 'high'; // Priority level (optional)
   tags?: string[];      // Tags/labels (optional)
 }
 ```
@@ -67,7 +67,7 @@ interface Todo {
 
 #### 3.3.1. Tool: `todo_create`
 
-**Mô tả**: Tạo một TODO item mới
+**Description**: Create a new TODO item
 
 **Input Schema**:
 ```json
@@ -76,19 +76,19 @@ interface Todo {
   "properties": {
     "title": {
       "type": "string",
-      "description": "Tiêu đề của TODO",
+      "description": "Title of the TODO",
       "minLength": 1,
       "maxLength": 200
     },
     "description": {
       "type": "string",
-      "description": "Mô tả chi tiết của TODO",
+      "description": "Detailed description of the TODO",
       "maxLength": 1000
     },
     "priority": {
       "type": "string",
       "enum": ["low", "medium", "high"],
-      "description": "Độ ưu tiên của TODO",
+      "description": "Priority level of the TODO",
       "default": "medium"
     },
     "tags": {
@@ -96,7 +96,7 @@ interface Todo {
       "items": {
         "type": "string"
       },
-      "description": "Danh sách tags",
+      "description": "List of tags",
       "maxItems": 10
     }
   },
@@ -136,7 +136,7 @@ interface Todo {
 
 #### 3.3.2. Tool: `todo_list`
 
-**Mô tả**: Lấy danh sách TODOs với khả năng filter
+**Description**: Get list of TODOs with filtering capabilities
 
 **Input Schema**:
 ```json
@@ -145,23 +145,23 @@ interface Todo {
   "properties": {
     "completed": {
       "type": "boolean",
-      "description": "Filter theo trạng thái hoàn thành"
+      "description": "Filter by completion status"
     },
     "priority": {
       "type": "string",
       "enum": ["low", "medium", "high"],
-      "description": "Filter theo độ ưu tiên"
+      "description": "Filter by priority level"
     },
     "tags": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Filter theo tags"
+      "description": "Filter by tags"
     },
     "search": {
       "type": "string",
-      "description": "Tìm kiếm trong title và description"
+      "description": "Search in title and description"
     },
     "sortBy": {
       "type": "string",
@@ -204,7 +204,7 @@ interface Todo {
 
 #### 3.3.3. Tool: `todo_update`
 
-**Mô tả**: Cập nhật thông tin của một TODO
+**Description**: Update information of a TODO
 
 **Input Schema**:
 ```json
@@ -213,7 +213,7 @@ interface Todo {
   "properties": {
     "id": {
       "type": "string",
-      "description": "ID của TODO cần update",
+      "description": "ID of the TODO to update",
       "pattern": "^[a-f0-9-]{36}$"
     },
     "title": {
@@ -275,7 +275,7 @@ interface Todo {
 
 #### 3.3.4.  Tool: `todo_delete`
 
-**Mô tả**: Xóa một TODO
+**Description**: Delete a TODO
 
 **Input Schema**:
 ```json
@@ -284,7 +284,7 @@ interface Todo {
   "properties": {
     "id": {
       "type": "string",
-      "description": "ID của TODO cần xóa",
+      "description": "ID of the TODO to delete",
       "pattern": "^[a-f0-9-]{36}$"
     }
   },
@@ -319,11 +319,11 @@ interface Todo {
 
 ## 4. MCP-UI Client Specification
 
-### 4.1.  Công Nghệ
-- **Framework**: React, Vue, hoặc vanilla HTML/CSS/JS
+### 4.1. Technology
+- **Framework**: React, Vue, or vanilla HTML/CSS/JS
 - **MCP Client**: `@modelcontextprotocol/sdk` Client library
-- **Styling**: Tailwind CSS hoặc minimal CSS
-- **State Management**: React hooks hoặc Vue composition API
+- **Styling**: Tailwind CSS or minimal CSS
+- **State Management**: React hooks or Vue composition API
 
 ### 4.2. UI Components
 
@@ -368,41 +368,41 @@ interface Todo {
 #### 4.2.2. Component Breakdown
 
 **1. LLMChatInterface Component**
-- Text input cho natural language commands
+- Text input for natural language commands
 - Message history display
 - Auto-scroll to latest message
-- Loading indicator khi đang xử lý
+- Loading indicator when processing
 
 **2. AddTodoForm Component**
 - Title input (required)
 - Description textarea (optional)
 - Priority select dropdown
 - Tags input (comma-separated)
-- Submit button gọi MCP `todo_create`
+- Submit button calls MCP `todo_create`
 
-**3.  TodoFilters Component**
+**3. TodoFilters Component**
 - Completed checkbox
 - Priority dropdown
 - Search input
 - Sort options
-- Filter button gọi MCP `todo_list` với filters
+- Filter button calls MCP `todo_list` with filters
 
 **4. TodoList Component**
-- Render danh sách TODOs
-- Checkbox để toggle completed
-- Edit button mở modal/inline edit
-- Delete button với confirmation
+- Render list of TODOs
+- Checkbox to toggle completed
+- Edit button opens modal/inline edit
+- Delete button with confirmation
 
 **5. TodoItem Component**
 - Display title, description, priority, tags
-- Checkbox gọi MCP `todo_update` để toggle completed
+- Checkbox calls MCP `todo_update` to toggle completed
 - Edit button
-- Delete button gọi MCP `todo_delete`
+- Delete button calls MCP `todo_delete`
 
 **6. EditTodoModal Component**
-- Form tương tự AddTodoForm
+- Form similar to AddTodoForm
 - Pre-fill data
-- Submit button gọi MCP `todo_update`
+- Submit button calls MCP `todo_update`
 
 ### 4.3. MCP Client Integration
 
@@ -467,25 +467,25 @@ const deleted = await client.callTool({
 });
 ```
 
-### 4.4. LLM Integration (QUAN TRỌNG!)
+### 4.4. LLM Integration (IMPORTANT!)
 
-**Yêu cầu**: Phải tích hợp LLM model client để test MCP tools
+**Requirement**: Must integrate LLM model client to test MCP tools
 
 **Implementation Options**:
 
 **Option 1: Claude Desktop Integration**
-- Configure MCP server trong Claude Desktop config
-- User có thể chat với Claude để tương tác với TODOs
+- Configure MCP server in Claude Desktop config
+- User can chat with Claude to interact with TODOs
 - Example: "Create a todo to buy milk with high priority"
 
 **Option 2: Built-in LLM Client**
-- Tích hợp Anthropic API trực tiếp
-- Chat interface trong web UI
-- LLM sử dụng MCP tools để thực hiện actions
+- Integrate Anthropic API directly
+- Chat interface in web UI
+- LLM uses MCP tools to perform actions
 
 **Option 3: OpenAI Function Calling**
-- Sử dụng OpenAI API với function calling
-- Map MCP tools thành OpenAI functions
+- Use OpenAI API with function calling
+- Map MCP tools to OpenAI functions
 - Natural language interface
 
 **Recommended: Option 1 + Option 2**
@@ -523,14 +523,14 @@ async function handleLLMChat(userMessage: string) {
 
 ---
 
-## 5. Cấu Trúc Thư Mục Dự Án
+## 5. Project Directory Structure
 
 ```
 mcp-todo-demo/
-├── README.md                 # Hướng dẫn chính
-├── SPECIFICATION.md          # File này
+├── README.md                 # Main guide
+├── SPECIFICATION.md          # This file
 ├── LICENSE                   # MIT License
-├── . gitignore
+├── .gitignore
 │
 ├── mcp-server/              # MCP Server
 │   ├── package.json
@@ -587,12 +587,12 @@ mcp-todo-demo/
 
 ## 6. Setup & Installation
 
-### 6.1.  Prerequisites
+### 6.1. Prerequisites
 - Node.js >= 18.x
-- npm hoặc pnpm
-- Claude Desktop (optional, cho LLM testing)
+- npm or pnpm
+- Claude Desktop (optional, for LLM testing)
 
-### 6.2.  Installation Steps
+### 6.2. Installation Steps
 
 **1. Clone repository**:
 ```bash
@@ -647,26 +647,26 @@ Access UI at: `http://localhost:5173`
 ## 7. Testing Requirements
 
 ### 7.1. Unit Tests
-- Test mỗi MCP tool handler
+- Test each MCP tool handler
 - Test storage layer
 - Test validation logic
 
-### 7.2.  Integration Tests
+### 7.2. Integration Tests
 - Test MCP client-server communication
 - Test tool chaining
 - Test error handling
 
 ### 7.3. LLM Testing (REQUIRED!)
-**Phải test với LLM model client**:
+**Must test with LLM model client**:
 
 **Test Cases**:
 1. "Create a todo to buy milk"
    - Expected: LLM calls `todo_create` tool
    
 2. "Show me all incomplete todos"
-   - Expected: LLM calls `todo_list` với filter completed=false
+   - Expected: LLM calls `todo_list` with filter completed=false
    
-3.  "Mark the milk todo as completed"
+3. "Mark the milk todo as completed"
    - Expected: LLM calls `todo_list` → finds todo → calls `todo_update`
    
 4. "Delete all completed todos"
@@ -676,8 +676,8 @@ Access UI at: `http://localhost:5173`
    - Expected: LLM calls `todo_create` 3 times
 
 **Testing Tools**:
-- Claude Desktop với MCP server configured
-- Built-in LLM chat interface trong UI
+- Claude Desktop with MCP server configured
+- Built-in LLM chat interface in UI
 - MCP Inspector tool
 
 ---
@@ -685,7 +685,7 @@ Access UI at: `http://localhost:5173`
 ## 8. Documentation Requirements
 
 ### 8.1. README.md
-Phải bao gồm:
+Must include:
 - Project overview
 - Quick start guide
 - Screenshots/GIFs
@@ -693,10 +693,10 @@ Phải bao gồm:
 - Troubleshooting
 - Contributing guidelines
 
-### 8.2.  API. md
-- Detailed API documentation cho mỗi MCP tool
+### 8.2. API.md
+- Detailed API documentation for each MCP tool
 - Request/response examples
-- Error codes và handling
+- Error codes and handling
 
 ### 8.3. SETUP.md
 - Step-by-step setup instructions
@@ -704,7 +704,7 @@ Phải bao gồm:
 - Claude Desktop integration
 - LLM testing setup
 
-### 8.4.  TESTING.md
+### 8.4. TESTING.md
 - How to run tests
 - LLM test scenarios
 - Expected behaviors
@@ -720,17 +720,17 @@ Phải bao gồm:
 - Support 1000+ TODOs without performance issues
 
 ### 9.2. Security
-- Input validation trên server
+- Input validation on server
 - Sanitize user inputs
 - No injection vulnerabilities
 
-### 9.3.  Code Quality
-- TypeScript với strict mode
+### 9.3. Code Quality
+- TypeScript with strict mode
 - ESLint configuration
 - Prettier formatting
-- Clear comments và documentation
+- Clear comments and documentation
 
-### 9.4.  User Experience
+### 9.4. User Experience
 - Clean, minimal UI
 - Clear error messages
 - Loading states
@@ -742,8 +742,8 @@ Phải bao gồm:
 ## 10.  Deliverables
 
 ### 10.1. Code
-- ✅ MCP Server với 4 tools
-- ✅ MCP UI Client với React/Vue
+- ✅ MCP Server with 4 tools
+- ✅ MCP UI Client with React/Vue
 - ✅ LLM Chat interface
 - ✅ Storage layer
 - ✅ Type definitions
@@ -751,7 +751,7 @@ Phải bao gồm:
 
 ### 10.2. Documentation
 - ✅ README.md
-- ✅ SPECIFICATION.md (file này)
+- ✅ SPECIFICATION.md (this file)
 - ✅ API.md
 - ✅ SETUP.md
 - ✅ TESTING.md
@@ -760,7 +760,7 @@ Phải bao gồm:
 - ✅ package.json files
 - ✅ TypeScript configs
 - ✅ Claude Desktop config example
-- ✅ . env. example
+- ✅ .env.example
 
 ### 10.4. Examples
 - ✅ Sample TODO data
@@ -772,14 +772,14 @@ Phải bao gồm:
 ## 11. Success Criteria
 
 ✅ **MCP Server**:
-- 4 tools hoạt động đúng
+- 4 tools working correctly
 - Clear JSON schemas
 - Proper error handling
 - Documented API
 
 ✅ **MCP UI Client**:
-- CRUD operations qua UI buttons
-- Filters và search working
+- CRUD operations via UI buttons
+- Filters and search working
 - Responsive design
 - LLM chat interface working
 
@@ -803,7 +803,7 @@ Phải bao gồm:
 
 ---
 
-## 12.  Timeline Estimate
+## 12. Timeline Estimate
 
 - **Phase 1 - MCP Server** (4-6 hours):
   - Setup project structure
@@ -836,18 +836,18 @@ Phải bao gồm:
 ## 13. Technical Decisions
 
 ### 13.1. Why Node.js + TypeScript?
-- MCP SDK có support tốt
+- MCP SDK has good support
 - Type safety
 - Large ecosystem
 - Easy deployment
 
-### 13.2.  Why In-Memory Storage?
+### 13.2. Why In-Memory Storage?
 - Simplicity
 - No database setup needed
 - Fast for demo
 - Can upgrade to SQLite/PostgreSQL later
 
-### 13. 3. Why React + Vite?
+### 13.3. Why React + Vite?
 - Fast development
 - Modern tooling
 - Great DX
@@ -863,8 +863,8 @@ Phải bao gồm:
 
 ## 14. Future Enhancements
 
-Những tính năng có thể thêm sau:
-- [ ] Due dates và reminders
+Features that can be added later:
+- [ ] Due dates and reminders
 - [ ] Categories/projects
 - [ ] Collaboration/sharing
 - [ ] Persistent storage (SQLite/PostgreSQL)
@@ -890,8 +890,8 @@ Những tính năng có thể thêm sau:
 
 ## 16. Contact & Support
 
-For questions về specification này:
-- Create an issue trong GitHub repo
+For questions about this specification:
+- Create an issue in GitHub repo
 - Email: your-email@example.com
 - Discord: Your Discord handle
 

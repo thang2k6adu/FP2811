@@ -2,12 +2,12 @@ export type Priority = 'low' | 'medium' | 'high';
 
 export interface Todo {
   id: string;           // UUID v4
-  title: string;        // Tiêu đề TODO
-  description?: string; // Mô tả chi tiết (optional)
-  completed: boolean;   // Trạng thái hoàn thành
+  title: string;        // TODO title
+  description?: string; // Detailed description (optional)
+  completed: boolean;   // Completion status
   createdAt: string;    // ISO 8601 timestamp
   updatedAt: string;    // ISO 8601 timestamp
-  priority?: Priority;  // Độ ưu tiên (optional)
+  priority?: Priority;  // Priority level (optional)
   tags?: string[];      // Tags/labels (optional)
 }
 
