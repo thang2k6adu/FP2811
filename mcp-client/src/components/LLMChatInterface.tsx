@@ -333,10 +333,10 @@ export function LLMChatInterface({ onTodoChange }: LLMChatInterfaceProps) {
   return (
     <div className="llm-chat-container">
       <div className="llm-chat-header">
-        <h3>🤖 AI Assistant (GPT-3.5)</h3>
+        <h3>AI Assistant (GPT-3.5)</h3>
         {!OPENAI_API_KEY && (
           <div className="api-key-warning">
-            ⚠️ Set VITE_OPENAI_API_KEY in .env file
+            Set VITE_OPENAI_API_KEY in .env file
           </div>
         )}
       </div>

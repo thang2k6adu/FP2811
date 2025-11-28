@@ -308,14 +308,14 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
 <body>
   <div class="app-container">
     <div class="header">
-      <h1>📝 MCP TODO</h1>
+      <h1>MCP TODO</h1>
       <p>Manage your tasks with Model Context Protocol</p>
     </div>
     
     <div id="error-message" class="error" style="display: none;"></div>
     
     <div class="card">
-      <h2>➕ Add New Todo</h2>
+      <h2>Add New Todo</h2>
       <form id="todo-form">
         <div class="form-group">
           <label for="title">Title *</label>
@@ -338,7 +338,7 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
     </div>
     
     <div class="card">
-      <h2>🔍 Filters</h2>
+      <h2>Filters</h2>
       <div class="filters">
         <div class="filter-group">
           <label>
@@ -362,7 +362,7 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
     </div>
     
     <div class="card">
-      <h2>📋 Todo List <span id="todo-count" style="color: #667eea;">(0)</span></h2>
+      <h2>Todo List <span id="todo-count" style="color: #667eea;">(0)</span></h2>
       <div id="todo-list" class="loading">Loading todos...</div>
     </div>
   </div>
@@ -515,10 +515,6 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
       if (todos.length === 0) {
         todoList.innerHTML = \`
           <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 11l3 3L22 4"></path>
-              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
-            </svg>
             <p>No todos found. Create one to get started!</p>
           </div>
         \`;
@@ -532,15 +528,15 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
             \${todo.description ? \`<div class="todo-description">\${escapeHtml(todo.description)}</div>\` : ''}
             <div class="todo-meta">
               <span class="priority-badge priority-\${todo.priority}">\${todo.priority}</span>
-              <span>📅 \${new Date(todo.createdAt).toLocaleDateString()}</span>
+              <span>\${new Date(todo.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
           <div class="todo-actions">
             <button class="btn-small \${todo.completed ? 'btn-secondary' : 'btn-success'}" 
                     onclick="toggleTodo('\${todo.id}', \${!todo.completed})">
-              \${todo.completed ? '↩️ Undo' : '✅ Complete'}
+              \${todo.completed ? 'Undo' : 'Complete'}
             </button>
-            <button class="btn-small btn-danger" onclick="deleteTodo('\${todo.id}')">🗑️ Delete</button>
+            <button class="btn-small btn-danger" onclick="deleteTodo('\${todo.id}')">Delete</button>
           </div>
         </div>
       \`).join('');
