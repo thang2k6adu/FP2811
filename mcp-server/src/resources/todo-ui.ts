@@ -371,18 +371,75 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
     let todos = [];
     let filters = {};
     
+    // Listen for reload-todos message from parent - register EARLY
+    window.addEventListener('message', (event) => {
+      console.log('🔔 Iframe received ANY message (global listener):', {
+        type: event.data?.type,
+        data: event.data,
+        origin: event.origin,
+        timestamp: new Date().toISOString(),
+      });
+      
+      if (event.data && event.data.type === 'reload-todos') {
+        console.log('✅ Iframe received reload-todos message - calling loadTodos()');
+        loadTodos();
+      }
+    });
+    
     // Helper function to call MCP tools via postMessage
     async function callTool(toolName, params) {
       return new Promise((resolve, reject) => {
         const messageId = Date.now() + Math.random();
         
         const handler = (event) => {
-          if (event.data.type === 'tool-response' && event.data.messageId === messageId) {
-            window.removeEventListener('message', handler);
-            if (event.data.error) {
-              reject(new Error(event.data.error));
+          // Log ALL messages to debug (even from other sources)
+          if (event.data && typeof event.data === 'object') {
+            console.log('Iframe received ANY message:', {
+              type: event.data.type,
+              messageId: event.data.messageId,
+              expectedMessageId: messageId,
+              messageIdType: typeof event.data.messageId,
+              expectedType: typeof messageId,
+              hasResult: !!event.data.result,
+              hasError: !!event.data.error,
+              origin: event.origin,
+              fullData: event.data,
+            });
+          }
+          
+          if (event.data && event.data.type === 'tool-response') {
+            // Check if messageId matches (with some tolerance for floating point)
+            const receivedMessageId = event.data.messageId;
+            const receivedNum = typeof receivedMessageId === 'number' ? receivedMessageId : parseFloat(receivedMessageId);
+            const expectedNum = typeof messageId === 'number' ? messageId : parseFloat(messageId);
+            
+            // More lenient matching - check if they're very close (within 0.1)
+            const messageIdMatches = receivedNum === expectedNum || 
+                                     (typeof receivedNum === 'number' && typeof expectedNum === 'number' && 
+                                      Math.abs(receivedNum - expectedNum) < 0.1);
+            
+            console.log('MessageId comparison:', {
+              received: receivedMessageId,
+              receivedNum: receivedNum,
+              expected: messageId,
+              expectedNum: expectedNum,
+              matches: messageIdMatches,
+              diff: typeof receivedNum === 'number' && typeof expectedNum === 'number' ? Math.abs(receivedNum - expectedNum) : 'N/A',
+            });
+            
+            if (messageIdMatches) {
+              window.removeEventListener('message', handler);
+              console.log('Iframe matched messageId, processing response:', event.data);
+              if (event.data.error) {
+                console.error('Iframe received error:', event.data.error);
+                reject(new Error(event.data.error));
+              } else {
+                console.log('Iframe received result:', event.data.result);
+                console.log('Result content:', event.data.result?.content);
+                resolve(event.data.result);
+              }
             } else {
-              resolve(event.data.result);
+              console.log('MessageId mismatch - ignoring this message');
             }
           }
         };
@@ -390,6 +447,7 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
         window.addEventListener('message', handler);
         
         // Send tool call request to parent (MCP client)
+        console.log('Iframe sending tool call:', { toolName, params, messageId });
         window.parent.postMessage({
           type: 'tool',
           payload: {
@@ -409,29 +467,40 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
     
     // Helper to parse tool response
     function parseToolResponse(response) {
-      if (response.content && response.content[0] && response.content[0].type === 'text') {
+      console.log('parseToolResponse called with:', response);
+      if (response && response.content && response.content[0] && response.content[0].type === 'text') {
         try {
-          return JSON.parse(response.content[0].text);
+          const parsed = JSON.parse(response.content[0].text);
+          console.log('parseToolResponse parsed:', parsed);
+          return parsed;
         } catch (e) {
-          return { success: false, error: { message: 'Invalid response format' } };
+          console.error('parseToolResponse parse error:', e, 'text:', response.content[0].text);
+          return { success: false, error: { message: 'Invalid response format: ' + e.message } };
         }
       }
+      console.error('parseToolResponse: No content in response', response);
       return { success: false, error: { message: 'No content in response' } };
     }
     
     // Load todos
     async function loadTodos() {
       try {
+        console.log('Loading todos with filters:', filters);
         const response = await callTool('todo_list', filters);
+        console.log('Todo list response:', response);
         const result = parseToolResponse(response);
+        console.log('Parsed todo list result:', result);
         
         if (result.success) {
           todos = result.data.todos || [];
+          console.log('Loaded todos:', todos.length, todos);
           renderTodos();
         } else {
+          console.error('Failed to load todos:', result.error);
           showError(result.error?.message || 'Failed to load todos');
         }
       } catch (error) {
+        console.error('Error loading todos:', error);
         showError('Error loading todos: ' + error.message);
       }
     }
@@ -539,21 +608,29 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
       const description = formData.get('description') || '';
       const priority = formData.get('priority');
       
+      console.log('Form submitted:', { title, description, priority });
+      
       try {
         const response = await callTool('todo_create', {
           title,
           description: description || undefined,
           priority
         });
+        console.log('Create todo response:', response);
         const result = parseToolResponse(response);
+        console.log('Parsed result:', result);
         
         if (result.success) {
           e.target.reset();
+          console.log('Todo created successfully, reloading todos...');
           await loadTodos();
+          console.log('Todos reloaded');
         } else {
+          console.error('Failed to create todo:', result.error);
           showError(result.error?.message || 'Failed to create todo');
         }
       } catch (error) {
+        console.error('Error creating todo:', error);
         showError('Error creating todo: ' + error.message);
       }
     });
@@ -577,6 +654,9 @@ export function createTodoUIResource(): ReturnType<typeof createUIResource> {
     // Make functions globally available
     window.toggleTodo = toggleTodo;
     window.deleteTodo = deleteTodo;
+    
+    // Log that script is ready
+    console.log('✅ Iframe script loaded and ready. Event listeners registered.');
     
     // Initial load
     loadTodos();

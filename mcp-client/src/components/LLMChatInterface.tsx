@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import OpenAI from 'openai';
+import { getSessionId } from '../lib/session';
 import './LLMChatInterface.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -131,7 +132,7 @@ export function LLMChatInterface({ onTodoChange }: LLMChatInterfaceProps) {
 
   // Call MCP tool via proxy
   const callMCPTool = async (toolName: string, params: any) => {
-    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const sessionId = getSessionId();
     
     const response = await fetch(`${API_BASE_URL}/api/tools/${toolName}`, {
       method: 'POST',
