@@ -1,0 +1,53 @@
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread, cheese",
+    "completed": false,
+    "createdAt": "2025-11-28T10:00:00.000Z",
+    "updatedAt": "2025-11-28T10:00:00.000Z",
+    "priority": "high",
+    "tags": ["shopping", "urgent"]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "title": "Finish project report",
+    "description": "Complete the quarterly report for Q4",
+    "completed": false,
+    "createdAt": "2025-11-28T09:00:00.000Z",
+    "updatedAt": "2025-11-28T09:00:00.000Z",
+    "priority": "medium",
+    "tags": ["work", "important"]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "title": "Call mom",
+    "description": "Weekly check-in call",
+    "completed": true,
+    "createdAt": "2025-11-27T14:00:00.000Z",
+    "updatedAt": "2025-11-27T15:30:00.000Z",
+    "priority": "low",
+    "tags": ["personal", "family"]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440003",
+    "title": "Review code changes",
+    "description": "Review pull request #123",
+    "completed": false,
+    "createdAt": "2025-11-28T08:00:00.000Z",
+    "updatedAt": "2025-11-28T08:00:00.000Z",
+    "priority": "high",
+    "tags": ["work", "code-review"]
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440004",
+    "title": "Exercise",
+    "description": "30 minutes of cardio",
+    "completed": false,
+    "createdAt": "2025-11-28T07:00:00.000Z",
+    "updatedAt": "2025-11-28T07:00:00.000Z",
+    "priority": "medium",
+    "tags": ["health", "daily"]
+  }
+]
+
