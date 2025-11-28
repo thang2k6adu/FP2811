@@ -13,6 +13,7 @@ This project consists of:
 
 - ✅ **4 MCP Tools**: `todo_create`, `todo_list`, `todo_update`, `todo_delete` with clear JSON schemas
 - ✅ **MCP-UI Client**: Clean, minimal UI with buttons tied to MCP tools
+- ✅ **LLM Chat Interface**: Built-in GPT-3.5 chat for natural language todo management
 - ✅ **Full CRUD Operations**: Add, list, edit, and delete todos through intuitive interface
 - ✅ **Priority Levels**: Low, medium, high priority support
 - ✅ **Filtering & Search**: Filter by completion status, priority, and search todos
@@ -53,12 +54,19 @@ cd ../mcp-client
 npm install
 ```
 
-5. **Configure Environment** (optional):
+5. **Configure Environment**:
 ```bash
 cd mcp-client
-# Set custom API URL if needed
-echo "VITE_API_URL=http://localhost:3001" > .env
+
+# Copy example env file
+cp .env.example .env
+
+# Edit .env and add your OpenAI API key
+# Get API key from: https://platform.openai.com/api-keys
+# VITE_OPENAI_API_KEY=sk-your-api-key-here
 ```
+
+**Note**: The OpenAI API key is required for the LLM chat interface. Without it, the chat will show a warning but the UI will still work.
 
 ### Running the Application
 

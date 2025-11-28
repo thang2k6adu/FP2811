@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UIResourceRenderer } from '@mcp-ui/client';
+import { LLMChatInterface } from './components/LLMChatInterface';
 import './styles/main.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -178,21 +179,31 @@ function App() {
 
   console.log('Rendering with resource:', resource);
   
+  const [refreshKey, setRefreshKey] = useState(0);
+  
+  const handleTodoChange = () => {
+    // Trigger refresh of UI resource
+    setRefreshKey((prev) => prev + 1);
+  };
+  
   return (
-    <div className="container" style={{ minHeight: '100vh', width: '100%' }}>
-      <UIResourceRenderer
-        resource={resource}
-        onUIAction={handleUIAction}
-        htmlProps={{
-          autoResizeIframe: { width: true, height: true },
-          style: {
-            width: '100%',
-            minHeight: '100vh',
-            border: 'none',
-            display: 'block',
-          },
-        }}
-      />
+    <div className="container" style={{ minHeight: '100vh', width: '100%', padding: '20px' }}>
+      <LLMChatInterface onTodoChange={handleTodoChange} />
+      <div key={refreshKey}>
+        <UIResourceRenderer
+          resource={resource}
+          onUIAction={handleUIAction}
+          htmlProps={{
+            autoResizeIframe: { width: true, height: true },
+            style: {
+              width: '100%',
+              minHeight: '600px',
+              border: 'none',
+              display: 'block',
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }
