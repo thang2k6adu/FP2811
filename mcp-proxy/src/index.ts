@@ -92,6 +92,52 @@ app.get('/api/tools', async (req, res) => {
   }
 });
 
+// List available resources
+app.get('/api/resources', async (req, res) => {
+  try {
+    const sessionId = req.headers['x-session-id'] as string || 'default';
+    const client = await getClient(sessionId);
+    
+    // Get resources list
+    const resources = await client.listResources();
+    res.json(resources);
+  } catch (error) {
+    console.error('Error listing resources:', error);
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+    });
+  }
+});
+
+// Read a resource
+app.get('/api/resources/:uri', async (req, res) => {
+  try {
+    const { uri } = req.params;
+    const sessionId = req.headers['x-session-id'] as string || 'default';
+    const client = await getClient(sessionId);
+    
+    // Decode URI
+    const decodedUri = decodeURIComponent(uri);
+    
+    // Read resource
+    const resource = await client.readResource({
+      uri: decodedUri,
+    });
+    res.json(resource);
+  } catch (error) {
+    console.error('Error reading resource:', error);
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`MCP Proxy Server running on http://localhost:${PORT}`);

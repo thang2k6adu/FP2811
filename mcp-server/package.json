@@ -17,6 +17,7 @@
   "author": "thang2k6adu",
   "license": "MIT",
   "dependencies": {
+    "@mcp-ui/server": "^5.13.1",
     "@modelcontextprotocol/sdk": "^1.0.4",
     "uuid": "^9.0.1"
   },

@@ -1,22 +1,22 @@
 # MCP TODO Demo Application
 
-A complete demonstration application showcasing the capabilities of Model Context Protocol (MCP) through a fully functional TODO management system.
+A complete demonstration application showcasing the capabilities of Model Context Protocol (MCP) and MCP-UI through a fully functional TODO management system.
 
 ## Overview
 
 This project consists of:
-- **MCP Server**: Provides 4 tools for TODO management via MCP protocol
-- **MCP-UI Client**: Web interface for interacting with the MCP server
-- **LLM Integration**: Natural language interface using Anthropic's Claude API
+- **MCP Server**: Provides 4 tools for TODO management and a UI resource via MCP protocol
+- **MCP-UI Client**: Web interface using `@mcp-ui/client` to render UI resources from the MCP server
+- **MCP Proxy**: HTTP bridge between browser client and MCP server (stdio)
 
 ## Features
 
-- ✅ Create, read, update, and delete TODOs
-- ✅ Filter and search TODOs
-- ✅ Priority levels (low, medium, high)
-- ✅ Tags support
-- ✅ Natural language interaction via LLM chat
-- ✅ Modern, responsive UI
+- ✅ **4 MCP Tools**: `todo_create`, `todo_list`, `todo_update`, `todo_delete` with clear JSON schemas
+- ✅ **MCP-UI Client**: Clean, minimal UI with buttons tied to MCP tools
+- ✅ **Full CRUD Operations**: Add, list, edit, and delete todos through intuitive interface
+- ✅ **Priority Levels**: Low, medium, high priority support
+- ✅ **Filtering & Search**: Filter by completion status, priority, and search todos
+- ✅ **Modern UI**: Beautiful gradient design with smooth animations
 
 ## Quick Start
 
@@ -24,7 +24,6 @@ This project consists of:
 
 - Node.js >= 18.x
 - npm or pnpm
-- Anthropic API key (for LLM chat feature)
 
 ### Installation
 
@@ -54,65 +53,65 @@ cd ../mcp-client
 npm install
 ```
 
-5. **Configure Environment** (optional, for LLM chat):
+5. **Configure Environment** (optional):
 ```bash
 cd mcp-client
-
-# Option 1: Use OpenAI GPT-3.5 (cheaper, recommended)
-echo "VITE_LLM_PROVIDER=openai" > .env
-echo "VITE_OPENAI_API_KEY=sk-..." >> .env
-
-# Option 2: Use Claude (more expensive but better quality)
-# echo "VITE_LLM_PROVIDER=claude" > .env
-# echo "VITE_ANTHROPIC_API_KEY=sk-ant-api03-..." >> .env
+# Set custom API URL if needed
+echo "VITE_API_URL=http://localhost:3001" > .env
 ```
 
 ### Running the Application
 
-1. **Start MCP Server** (in terminal 1):
-```bash
-cd mcp-server
-npm run build  # Build first
-npm run dev    # Watch mode (optional)
-```
+You need to run three services in separate terminals:
 
-2. **Start MCP Proxy Server** (in terminal 2):
+1. **Start MCP Proxy Server** (Terminal 1):
 ```bash
 cd mcp-proxy
 npm start
 ```
+The proxy server will run on `http://localhost:3001` and bridge HTTP requests to the MCP server.
 
-3. **Start UI Client** (in terminal 3):
+2. **Start UI Client** (Terminal 2):
 ```bash
 cd mcp-client
 npm run dev
 ```
+The client will be available at `http://localhost:5173`
 
-4. **Access the application**:
+3. **Access the application**:
    - Open your browser to `http://localhost:5173`
-   - The UI will automatically connect to the MCP proxy server
+   - The UI will automatically fetch the UI resource from the MCP server via the proxy
+   - You can now add, list, edit, and delete todos through the beautiful interface
+
+**Note**: The MCP server is started automatically by the proxy server when needed. You don't need to run it separately.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    MCP-UI CLIENT                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │   Web UI     │  │  LLM Chat    │  │  HTTP Client  │ │
-│  │  (Buttons)   │  │  Interface   │  │   (Browser)   │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘ │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  UIResourceRenderer (@mcp-ui/client)              │  │
+│  │  - Fetches UI resource from server                │  │
+│  │  - Renders HTML in sandboxed iframe               │  │
+│  │  - Handles tool calls via postMessage             │  │
+│  └──────────────────────────────────────────────────┘  │
 └─────────────────────────┬───────────────────────────────┘
                           │ HTTP REST API
 ┌─────────────────────────▼───────────────────────────────┐
 │                  MCP PROXY SERVER                        │
 │              (HTTP → stdio bridge)                       │
+│  - /api/tools/:toolName                                  │
+│  - /api/resources                                        │
+│  - /api/resources/:uri                                   │
 └─────────────────────────┬───────────────────────────────┘
                           │ MCP Protocol (stdio)
 ┌─────────────────────────▼───────────────────────────────┐
 │                    MCP SERVER                           │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │  MCP Tools   │  │   Business   │  │   Storage    │ │
-│  │  Handlers    │  │    Logic     │  │   Layer      │ │
+│  │  MCP Tools   │  │ UI Resources │  │   Storage    │ │
+│  │  Handlers    │  │ (@mcp-ui/    │  │   Layer      │ │
+│  │              │  │  server)     │  │              │ │
 │  └──────────────┘  └──────────────┘  └──────────────┘ │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -128,14 +127,18 @@ The server exposes 4 tools:
 
 See [API.md](docs/API.md) for detailed API documentation.
 
-## LLM Chat Interface
+## MCP-UI Resources
 
-The application includes a natural language chat interface. You can use either OpenAI GPT-3.5-turbo (cheaper) or Claude 3.5 Sonnet (better quality). You can interact with your TODOs using natural language:
+The server exposes 1 UI resource:
 
-- "Create a todo to buy milk with high priority"
-- "Show me all incomplete todos"
-- "Mark the milk todo as completed"
-- "Delete all completed todos"
+1. **ui://todo/interface**: Interactive TODO management interface
+
+This UI resource is created using `@mcp-ui/server` and contains an HTML interface that:
+- Renders in a sandboxed iframe for security
+- Communicates with the MCP server via tool calls
+- Provides a complete TODO management interface
+
+The client uses `UIResourceRenderer` from `@mcp-ui/client` to render this resource.
 
 ## Project Structure
 
@@ -150,11 +153,10 @@ FP2811/
 ├── mcp-proxy/          # HTTP Proxy Server (stdio bridge)
 │   ├── src/
 │   └── dist/          # Compiled output
-├── mcp-client/         # React UI client
+├── mcp-client/         # React UI client (using @mcp-ui/client)
 │   ├── src/
-│   │   ├── components/ # React components
-│   │   ├── hooks/      # React hooks
-│   │   └── lib/       # HTTP client library
+│   │   ├── App.tsx     # Main app with UIResourceRenderer
+│   │   └── styles/     # CSS styles
 │   └── dist/          # Build output
 ├── docs/              # Documentation
 └── examples/          # Example configurations
@@ -175,14 +177,13 @@ FP2811/
 - Check that proxy server is accessible at `http://localhost:3001`
 - Verify Node.js version >= 18
 
-### LLM Chat not working
+### UI Resource not loading
 
-- Ensure API key is set in `mcp-client/.env`:
-  - For OpenAI: `VITE_OPENAI_API_KEY=sk-...`
-  - For Claude: `VITE_ANTHROPIC_API_KEY=sk-ant-api03-...`
-- Set `VITE_LLM_PROVIDER=openai` or `VITE_LLM_PROVIDER=claude`
-- Check your API key is valid
-- Verify network connectivity
+- Ensure the MCP server is built: `cd mcp-server && npm run build`
+- Ensure the proxy server is running: `cd mcp-proxy && npm start`
+- Check browser console for errors
+- Verify the resource URI `ui://todo/interface` is available
+- Check that `@mcp-ui/client` and `@mcp-ui/server` are properly installed
 
 ### Build errors
 
@@ -205,4 +206,19 @@ thang2k6adu
 ---
 
 **Status**: Ready for use ✅
+
+## Testing with LLM Client
+
+As mentioned in the requirements, this application is designed to work with LLM clients. The MCP server can be integrated with any MCP-compatible client (like Claude Desktop, Cursor, etc.) to manage todos through natural language.
+
+To test with an LLM client:
+1. Configure your LLM client to use this MCP server
+2. The server exposes 4 tools that the LLM can call
+3. The UI resource provides a visual interface for managing todos
+
+Example LLM interactions:
+- "Create a todo to buy groceries with high priority"
+- "Show me all incomplete todos"
+- "Mark the groceries todo as completed"
+- "Delete all completed todos"
 
